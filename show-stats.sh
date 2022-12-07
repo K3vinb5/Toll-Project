@@ -1,0 +1,1 @@
+hexdump -e '"| %d | %d | %d |\n"' estatisticas.dat
