@@ -1,16 +1,27 @@
+/******************************************************************************
+ ** ISCTE-IUL: Trabalho prático 3 de Sistemas Operativos
+ **
+ ** Aluno: Nº: XXXXXX  Nome: Este Módulo não precisa ser entregue
+ ** Nome do Módulo: utils.h
+ ** Descrição/Explicação do Módulo: 
+ **     Definição de funções utilitárias genéricas
+ **
+ ** OS ALUNOS NÃO DEVERÃO ACRESCENTAR NADA A ESTE FICHEIRO!!!
+ **
+ ******************************************************************************/
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <sys/time.h>
 
 /******************************************************************************
  *  Macros para tratamento de mensagens de DEBUG
  ******************************************************************************/
-#define TRUE  1
+#define TRUE 1
 #define FALSE 0
 
 /**
@@ -20,12 +31,31 @@
 
 /**
  *  Escreve uma mensagem de debug (parâmetros iguais ao printf) se DEBUG_MODE estiver a TRUE
+ *  @param passo (o passo do enunciado) ... os argumentos são os mesmos que os do printf(), logo recebe uma string de formatação e depois um número variável de argumentos
  */
-#define debug(fmt, ...) do { if (DEBUG_MODE) fprintf(stderr, "@@Debug@@:%s:%d:%s(): " fmt "\n", __FILE__, __LINE__, __func__, ## __VA_ARGS__); } while (0)
+#define debug(passo, fmt, ...) do { if (DEBUG_MODE) fprintf(stderr, "@@Debug@@:%s:%d:%s(): {" passo "} " fmt "\n", __FILE__, __LINE__, __func__, ## __VA_ARGS__); } while (0)
+
+/**
+ *  Escreve uma mensagem de debug (parâmetros iguais ao printf) se DEBUG_MODE estiver a TRUE
+ */
+#define debug1(fmt, ...) do { if (DEBUG_MODE) fprintf(stderr, "@@Debug@@:%s:%d:%s(): " fmt "\n", __FILE__, __LINE__, __func__, ## __VA_ARGS__); } while (0)
 
 /******************************************************************************
  *  Macros para impressão de mensagens de sucesso e de erro
  ******************************************************************************/
+
+/**
+ *  Escreve uma mensagem de sucesso (parâmetros iguais ao printf), deve ser usado em todas as mensagens "positivas" que a aplicação mostra
+ *  @param passo (o passo do enunciado) ... os argumentos são os mesmos que os do printf(), logo recebe uma string de formatação e depois um número variável de argumentos
+ */
+#define success(passo, fmt, ...) do { printf("@@Success@@ {" passo "} " fmt "\n", ## __VA_ARGS__); } while (0)
+
+/**
+ *  Escreve uma mensagem de erro (parâmetros iguais ao printf), deve ser usado em todas as mensagens "de erro" que a aplicação mostra.
+ *  Estas mensagens de erro são as "de negócio", e não as de erros referentes a problemas técnicos como abertura de ficheiros, etc. (onde se deve usar perror)
+ *  @param passo (o passo do enunciado) ... os argumentos são os mesmos que os do printf(), logo recebe uma string de formatação e depois um número variável de argumentos
+ */
+#define error(passo, fmt, ...) do { printf("@@Error@@ {" passo "} " fmt "\n", ## __VA_ARGS__); } while (0)
 
 /**
  *  Valida se uma operação teve sucesso ou não. Se não teve, escreve uma mensagem de erro e sai com erro -1, e mostrando a mensagem de erro,
@@ -55,6 +85,8 @@
 #define my_fgets(buffer, buffer_size, file) ({          \
     char* _result = fgets(buffer, buffer_size, file);   \
     if (NULL != _result) {                              \
+        while ('\n' == buffer[0])                       \
+            _result = fgets(buffer, buffer_size, file); \
         if ('\n' == buffer[strlen(buffer) - 1])         \
             buffer[strlen(buffer) - 1] = '\0';          \
         else {                                          \
@@ -79,28 +111,13 @@
  *  Macros utilitárias
  ******************************************************************************/
 
-#define my_rand() ({         \
-    struct timeval tv;       \
-    gettimeofday(&tv, NULL); \
-    srand(tv.tv_usec);       \
-    rand();                  \
+#define my_rand() ({            \
+    struct timeval tv;          \
+    gettimeofday(&tv, NULL);    \
+    srand(tv.tv_usec);          \
+    rand();                     \
 })
 
-/******************************************************************************
- *  Macros para impressão de mensagens de sucesso e de erro
- ******************************************************************************/
-
-/**
- *  Escreve uma mensagem de sucesso (parâmetros iguais ao printf), deve ser usado em todas as mensagens "positivas" que a aplicação mostra
- *  @param passo (o passo do enunciado) ... os argumentos são os mesmos que os do printf(), logo recebe uma string de formatação e depois um número variável de argumentos
- */
-#define success(passo, fmt, ...) do { printf("@@Success@@ {" passo "} " fmt "\n", ## __VA_ARGS__); } while (0)
-
-/**
- *  Escreve uma mensagem de erro (parâmetros iguais ao printf), deve ser usado em todas as mensagens "de erro" que a aplicação mostra.
- *  Estas mensagens de erro são as "de negócio", e não as de erros referentes a problemas técnicos como abertura de ficheiros, etc. (onde se deve usar perror)
- *  @param passo (o passo do enunciado) ... os argumentos são os mesmos que os do printf(), logo recebe uma string de formatação e depois um número variável de argumentos
- */
-#define error(passo, fmt, ...) do { printf("@@Error@@ {" passo "} " fmt "\n", ## __VA_ARGS__); } while (0)
+/* OS ALUNOS NÃO DEVERÃO ACRESCENTAR NADA A ESTE FICHEIRO!!! */
 
 #endif

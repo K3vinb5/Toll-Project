@@ -15,19 +15,10 @@
 
 #include <signal.h>
 #include <unistd.h>
-#include <sys/ipc.h>
-#include <sys/types.h>
-#include <sys/sem.h>
-#include <sys/msg.h>
-#include <sys/shm.h>
-
-/**
- *  KEY to be used on all Linux IPC get operations
- */
-#define IPC_KEY 0x0a98763      // Suggestion: Replace with your student number
 
 #define MIN_PROCESSAMENTO   1   // Tempo mínimo de processamento do Servidor
 #define MAX_PROCESSAMENTO   7   // Tempo máximo de processamento do Servidor
+#define MAX_ESPERA          7   // Tempo máximo de espera por parte do Cliente
 #define NUM_PASSAGENS      20   // Tamanho máximo do buffer de Passagens
 
 typedef struct {
@@ -44,38 +35,9 @@ typedef struct {
     int contadorAnomalias;      // Contador de Passagens detetadas com anomalias diversas
 } Contadores;
 
-typedef struct {                // Estrutura de dados a ser guardada em Memória Partilhada
-    Contadores contadores;
-    Passagem lista_passagens[NUM_PASSAGENS];
-} DadosServidor;
-
-typedef struct {
-    long tipoMensagem;          // Tipo de Mensagem (ou Mailbox)
-    struct {
-        int action;             // Ação associada à mensagem
-        union {                 // Nos dados, OU vai um pedido OU vão contadores
-            Passagem pedido_cliente;        // Preenchida se action == 1
-            Contadores contadores_servidor; // Preenchida se action == 3
-        } dados;
-    } conteudo;
-} Mensagem;
-
-#define FILE_STATS "estatisticas.dat"       // Ficheiro que armazena as estatísticas necessárias para o programa
-
-// Defines para o campo action da estrutura Mensagem.conteudo
-#define ACTION_PEDIDO            1
-#define ACTION_PEDIDO_ACK        2
-#define ACTION_PEDIDO_CONCLUIDO  3
-#define ACTION_PEDIDO_CANCELADO  4
-
-// Defines para o campo tipo_passagem da estrutura Passagem
-#define TIPO_PASSAGEM_INVALIDO  -1
-#define TIPO_PASSAGEM_NORMAL     1
-#define TIPO_PASSAGEM_VIAVERDE   2
-
-// Defines para identificar cada um dos semáforos do Grupo de Semáforos
-#define SEM_ESTATISTICAS         0
-#define SEM_LISTAPASSAGENS       1
+#define FILE_PEDIDOS   "pedidos.fifo"       // FIFO (Named Pipe) que serve para o Cliente fazer os pedidos ao Servidor
+#define FILE_SERVIDOR  "servidor.pid"       // Ficheiro que contém o PID do processo Servidor
+#define FILE_STATS     "estatisticas.dat"   // Ficheiro que armazena as estatísticas necessárias para o programa
 
 /* OS ALUNOS NÃO DEVERÃO ACRESCENTAR NADA A ESTE FICHEIRO! */
 
